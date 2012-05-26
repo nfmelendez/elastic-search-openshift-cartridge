@@ -47,12 +47,12 @@ IP=$OPENSHIFT_INTERNAL_IP
 client_result "nico - mongodir = $ELASTICSEARCH_DIR "
 if [ -d "$ELASTICSEARCH_DIR" ]
 then
-    client_error "Embedded mongodb-2.0 already attached to $application"
+    client_error "Embedded elastic search 0.19.4 is already attached to $application"
     exit 132
 fi
 mkdir -p "$ELASTICSEARCH_DIR"
 pushd "$ELASTICSEARCH_DIR" > /dev/null
-mkdir -p log etc data socket pid run
+mkdir -p logs work data conf pid
 sed "s,RHC_MONGODIR,$ELASTICSEARCH_DIR," $CART_ETC_DIR/mongodb.conf > $ELASTICSEARCH_DIR/etc/mongodb.conf
 sed -i "s,RHC_BIND_ADDR,$IP," $ELASTICSEARCH_DIR/etc/mongodb.conf
 popd > /dev/null
