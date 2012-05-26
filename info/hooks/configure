@@ -44,7 +44,7 @@ IP=$OPENSHIFT_INTERNAL_IP
 #
 # Create the core of the application
 #
-client_result "nico - mongodir = $ELASTICSEARCH_DIR "
+client_result "nico - r = $ELASTICSEARCH_DIR "
 if [ -d "$ELASTICSEARCH_DIR" ]
 then
     client_error "Embedded elastic search 0.19.4 is already attached to $application"
@@ -53,8 +53,11 @@ fi
 mkdir -p "$ELASTICSEARCH_DIR"
 pushd "$ELASTICSEARCH_DIR" > /dev/null
 mkdir -p logs work data conf pid
-sed "s,RHC_MONGODIR,$ELASTICSEARCH_DIR," $CART_ETC_DIR/mongodb.conf > $ELASTICSEARCH_DIR/etc/mongodb.conf
-sed -i "s,RHC_BIND_ADDR,$IP," $ELASTICSEARCH_DIR/etc/mongodb.conf
+sed "s,ELASTICSEARCH_CONF_PATH,$ELASTICSEARCH_DIR/conf," $CART_ETC_DIR/elasticsearch.yml > $ELASTICSEARCH_DIR/conf/elasticsearch.yml
+sed -i "s,ELASTICSEARCH_DATA_PATH,$ELASTICSEARCH_DIR/data," $ELASTICSEARCH_DIR/conf/elasticsearch.yml
+sed -i "s,ELASTICSEARCH_WORK_PATH,$ELASTICSEARCH_DIR/work," $ELASTICSEARCH_DIR/conf/elasticsearch.yml
+sed -i "s,ELASTICSEARCH_LOGS_PATH,$ELASTICSEARCH_DIR/logs," $ELASTICSEARCH_DIR/conf/elasticsearch.yml
+
 popd > /dev/null
 
 #
@@ -72,8 +75,8 @@ chown $user_id.$group_id -R $ELASTICSEARCH_DIR/ || error "Failed to chown new ap
 chown root.root "$ELASTICSEARCH_DIR" "$ELASTICSEARCH_DIR"/*.sh
 observe_setup_var_lib_dir "$ELASTICSEARCH_DIR"
 
-
-start_mongodb
+client_result "Trying to start elastic search"
+start_elasticsearch
 
 # Generate a password with no o's O's or 0's
 password=$(generate_password)
